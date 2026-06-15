@@ -81,8 +81,15 @@
   .feed{height:170px;overflow-y:auto;background:rgba(0,0,0,.28);border:2px solid #1c6b42;border-radius:6px;padding:10px 12px;font-size:12.5px}
   .feed .ev{padding:3px 0;border-bottom:1px dotted #ffffff14;animation:pop .25s}
   .feed .ev:last-child{border-bottom:none}
-  .feed .min{color:var(--gold);display:inline-block;width:34px}
+  .feed .min{color:var(--gold);display:inline-block;min-width:34px}
   .feed .goal{color:var(--green);font-weight:700}.feed .danger{color:#ffd27d}.feed .sub{color:#9fd0ff}
+  .pen-board{display:inline-block;margin-left:6px;font-weight:700;color:var(--gold);letter-spacing:1px}
+  .statbox{margin-top:12px;background:#06371f;border:2px solid #1c6b42;border-radius:6px;padding:10px 14px}
+  .sttitle{font-size:12px;color:var(--gold);letter-spacing:1px;text-align:center;margin-bottom:8px;font-weight:700}
+  .srow{display:flex;align-items:center;font-size:12px;padding:3px 0}
+  .srow .sl{width:46px;text-align:left;color:var(--green);font-weight:700}
+  .srow .sm{flex:1;text-align:center;color:#cfe6d6;font-size:11px;letter-spacing:1px}
+  .srow .sr{width:46px;text-align:right;color:var(--green);font-weight:700}
   @keyframes pop{from{opacity:0;transform:translateX(-4px)}to{opacity:1}}
   .matchctl{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
   .pill{font-size:10px;color:#9fb3a4;letter-spacing:1px;border:1px solid #1c6b42;border-radius:20px;padding:3px 10px}
@@ -119,6 +126,14 @@
   @keyframes bob{50%{transform:translateY(-8px)}}
   .champ h2{font-size:22px;color:var(--gold);margin:10px 0}
   .standings{margin-top:14px;font-size:12px;text-align:left;display:inline-block}
+  .lbtitle{font-size:12px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin:16px 0 6px;font-weight:700}
+  .leaderboard{display:flex;flex-direction:column;gap:4px;max-width:460px;margin:0 auto;text-align:left}
+  .lbrow{display:flex;align-items:center;gap:8px;background:#06371f;border:1px solid #1c6b42;border-radius:5px;padding:6px 10px;font-size:12px}
+  .lbrow.champ-row{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+  .lbpos{min-width:26px;text-align:center;font-weight:700;color:var(--gold)}
+  .lbname{flex:1;color:var(--paper)}
+  .lbnat{color:#9fb3a4;font-size:10px}
+  .lbround{color:var(--green);font-size:11px;font-weight:700;white-space:nowrap}
   .standings div{padding:2px 0}
   .out{color:var(--red);font-weight:700}
   footer{padding:8px 18px;font-size:10px;color:#5d7065;text-align:center;border-top:1px solid #000;background:#0c1410;flex:0 0 auto}
@@ -191,6 +206,58 @@ const GROUPS_2026={
 const GROUP_KEYS=Object.keys(GROUPS_2026);
 
 const SURNAMES=["Silva","Costa","Santos","Gómez","Fernández","Díaz","Diallo","Moreau","García","Torres","Walker","Hughes","Müller","Schmidt","Sousa","de Jong","Russo","Conti","Horvat","Kovač","Rodríguez","Pérez","Hernández","López","Johnson","Miller","Moreno","Rojas","Tanaka","Sato","Diop","Sarr","El Amrani","Benali","Jensen","Hansen","Meier","Keller","Kim","Park","Wilson","Murphy","Okafor","Eze","Kowalski","Nowak","Yilmaz","Demir","Novák","Svoboda","Andersson","Lindqvist","Mendoza","Vargas","Osei","Mensah"];
+/* Real, well-known goal threats per nation (2026 squads). These score most goals;
+   generic surnames fill the rest so no side feels empty. Verified headline names only. */
+const STARS={
+ "Argentina":["Messi","Julián Álvarez","Lautaro Martínez"],
+ "Spain":["Lamine Yamal","Morata","Oyarzabal","Nico Williams"],
+ "France":["Mbappé","Dembélé","Thuram"],
+ "England":["Kane","Bellingham","Foden","Saka"],
+ "Portugal":["Ronaldo","Bruno Fernandes","Leão"],
+ "Brazil":["Vinícius Jr","Raphinha","Rodrygo","Neymar"],
+ "Morocco":["Hakimi","En-Nesyri","Ziyech"],
+ "Netherlands":["Depay","Gakpo","Malen"],
+ "Belgium":["Lukaku","De Bruyne","Doku"],
+ "Germany":["Wirtz","Havertz","Musiala","Füllkrug"],
+ "Croatia":["Modrić","Kramarić","Budimir"],
+ "Colombia":["James Rodríguez","Luis Díaz","Borré"],
+ "Mexico":["Raúl Jiménez","Santiago Giménez","Alvarado"],
+ "Senegal":["Sadio Mané","Boulaye Dia","Ismaïla Sarr"],
+ "Uruguay":["Núñez","Pellistri","Araújo"],
+ "United States":["Pulisic","Balogun","Weah"],
+ "Japan":["Mitoma","Kamada","Ueda"],
+ "Switzerland":["Embolo","Ndoye","Vargas"],
+ "Iran":["Taremi","Azmoun","Jahanbakhsh"],
+ "Türkiye":["Güler","Yıldız","Aktürkoğlu"],
+ "Ecuador":["Valencia","Caicedo","Páez"],
+ "Austria":["Arnautović","Baumgartner","Gregoritsch"],
+ "South Korea":["Son","Hwang","Lee Kang-in"],
+ "Australia":["Duke","Irvine","Goodwin"],
+ "Algeria":["Mahrez","Bounedjah","Bensebaini"],
+ "Egypt":["Salah","Trezeguet","Marmoush"],
+ "Canada":["David","Larin","Buchanan"],
+ "Norway":["Haaland","Ødegaard","Sørloth"],
+ "Ivory Coast":["Haller","Krasso","Gradel"],
+ "Panama":["Fajardo","Carrasquilla","Bárcenas"],
+ "Sweden":["Gyökeres","Isak","Elanga"],
+ "Czechia":["Schick","Hložek","Chorý"],
+ "Paraguay":["Almirón","Sanabria","Enciso"],
+ "Scotland":["McTominay","Adams","Dykes"],
+ "Tunisia":["Msakni","Khazri","Jebali"],
+ "DR Congo":["Bakambu","Wissa","Tuanzebe"],
+ "Uzbekistan":["Shomurodov","Urunov","Masharipov"],
+ "Qatar":["Afif","Ali","Muntari"],
+ "Iraq":["Aymen Hussein","Al-Hamadi","Resan"],
+ "South Africa":["Mokoena","Zwane","Foster"],
+ "Saudi Arabia":["Al-Dawsari","Al-Shehri","Al-Buraikan"],
+ "Jordan":["Al-Naimat","Al-Tamari","Olwan"],
+ "Bosnia and Herzegovina":["Džeko","Demirović","Tabaković"],
+ "Cape Verde":["Tavares","Mendes","Livramento"],
+ "Ghana":["Kudus","Iñaki Williams","Semenyo"],
+ "Curacao":["Bacuna","Janga","Sambo"],
+ "Haiti":["Pierrot","Hérelle","Bahena"],
+ "New Zealand":["Wood","Stamenić","Garbett"],
+};
 const COMM={
  goal:["smashes it into the top corner!","slots past the keeper!","heads home from the corner!","with a cool finish one-on-one!","curls a free-kick into the net!","taps in at the back post!","with a thunderbolt from 25 yards!","buries the rebound!"],
  chance:["forces a fingertip save.","rattles the crossbar!","drags it just wide.","is denied by a last-ditch block.","sees the keeper smother it.","blazes over from close range!"],
@@ -214,7 +281,22 @@ const app=document.getElementById("app");
 const $=id=>document.getElementById(id);
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const scorer=()=>rnd(SURNAMES);
+// pick a scorer for a team: usually a real star, sometimes a generic squad name
+const scorer=(team)=>{
+  const stars=team&&STARS[team];
+  if(stars && Math.random()<0.7) return rnd(stars);
+  return rnd(SURNAMES);
+};
+// record a goal for the Golden Boot (real goals only, not penalties)
+function recordGoal(player,team){
+  if(!S.boot)S.boot={};
+  const key=player+"||"+team;
+  S.boot[key]=(S.boot[key]||0)+1;
+}
+// credit N goals to random scorers of a team (used for instantly-simmed CPU matches)
+function creditGoals(teamName,n){
+  for(let i=0;i<n;i++) recordGoal(scorer(teamName),teamName);
+}
 
 /* ============ SETUP ============ */
 function start(){
@@ -358,7 +440,7 @@ async function runMatchday(){
   S.groups.forEach((g,gi)=>fix.forEach(pair=>{
     const A=g[pair[0]],B=g[pair[1]];if(!A||!B)return;
     if(isHuman(A.name)||isHuman(B.name))return;
-    const r=quickScore(A.pw,B.pw);apply(A,B,r[0],r[1]);
+    const r=quickScore(A.pw,B.pw);apply(A,B,r[0],r[1]);creditGoals(A.name,r[0]);creditGoals(B.name,r[1]);
   }));
   S.gRound++;
   renderGroups(`Group Stage — ${S.gRound} of 3 matchdays done`);
@@ -418,6 +500,14 @@ async function liveMatch(home,away,opts){
 async function commentary(home,away,homeCtrl,awayCtrl,group,opts){
   let hs=0,as=0;
   const hq=homeCtrl?homeCtrl._qbonus:0, aq=awayCtrl?awayCtrl._qbonus:0;
+  const stat={hShots:0,aShots:0,hOn:0,aOn:0}; // shots and shots-on-target for post-match summary
+  // log a goal: update Golden Boot and shot stats, return the scorer name
+  const logGoal=(team,isHome)=>{
+    const name=scorer(team.name);
+    recordGoal(name,team.name);
+    if(isHome){stat.hShots++;stat.hOn++;} else {stat.aShots++;stat.aOn++;}
+    return name;
+  };
   app.innerHTML=`
     <div class="match-head">
       <div class="side"><div class="flag">${home.flag}</div><div class="nm">${home.name}</div><div class="mgr">${isHuman(home.name)?mgrName(home.name):'CPU'}</div></div>
@@ -461,7 +551,7 @@ async function commentary(home,away,homeCtrl,awayCtrl,group,opts){
     if(opts2.length===1)target=opts2[0];
     const doSub=(pair)=>{
       const[team,ctrl]=pair;
-      const fresh=scorer();
+      const fresh=scorer(team.name);
       ctrl._subs--;ctrl._subBoost+=0.06; // fresh legs nudge attacking output
       push(curMin,`<span class="sub">🔄 ${team.name} sub — ${fresh} on, fresh legs.</span>`,"sub");
       refreshSubs();paused=false;
@@ -492,10 +582,10 @@ async function commentary(home,away,homeCtrl,awayCtrl,group,opts){
       const ap=away.pw*(1+aq+(awayCtrl?awayCtrl._subBoost:0));
       const hxg=1.4*Math.pow(hp/ap,1.5)*hf.atk*af.def*1.06;
       const axg=1.4*Math.pow(ap/hp,1.5)*af.atk*hf.def;
-      if(Math.random()<hxg/90){hs++;scEl.textContent=`${hs} – ${as}`;push(m,`<span class="goal">⚽ GOAL! ${home.name}</span> — ${scorer()} ${rnd(COMM.goal)}`,"goal");}
-      else if(Math.random()<axg/90){as++;scEl.textContent=`${hs} – ${as}`;push(m,`<span class="goal">⚽ GOAL! ${away.name}</span> — ${scorer()} ${rnd(COMM.goal)}`,"goal");}
-      else if(Math.random()<0.10){const t=Math.random()<hxg/(hxg+axg)?home:away;push(m,`<span class="danger">${t.name}</span> ${rnd(COMM.chance)}`,"danger");}
-      else if(Math.random()<0.16){const t=Math.random()<.5?home:away;push(m,`${t.name} ${rnd(COMM.mid)}`);}
+      if(Math.random()<hxg/90){hs++;scEl.textContent=`${hs} – ${as}`;push(m,`<span class="goal">⚽ GOAL! ${home.name}</span> — ${logGoal(home,true)} ${rnd(COMM.goal)}`,"goal");}
+      else if(Math.random()<axg/90){as++;scEl.textContent=`${hs} – ${as}`;push(m,`<span class="goal">⚽ GOAL! ${away.name}</span> — ${logGoal(away,false)} ${rnd(COMM.goal)}`,"goal");}
+      else if(Math.random()<0.10){const t=Math.random()<hxg/(hxg+axg)?home:away;if(t===home){stat.hShots++;stat.hOn++;}else{stat.aShots++;stat.aOn++;}push(m,`<span class="danger">${t.name}</span> ${rnd(COMM.chance)}`,"danger");}
+      else if(Math.random()<0.16){const t=Math.random()<.5?home:away;if(Math.random()<0.4){t===home?stat.hShots++:stat.aShots++;}push(m,`${t.name} ${rnd(COMM.mid)}`);}
       // honour pause for subs
       while(paused) await sleep(60);
       if(!skip) await sleep(m%5===0?180:100);
@@ -553,7 +643,7 @@ async function commentary(home,away,homeCtrl,awayCtrl,group,opts){
       if(homeCtrl&&homeCtrl._subs>0)opts2.push([home,homeCtrl]);
       if(awayCtrl&&awayCtrl._subs>0)opts2.push([away,awayCtrl]);
       const doSub=(pair)=>{const[team,ctrl]=pair;ctrl._subs--;ctrl._subBoost+=0.06;
-        push2(curMin,`<span class="sub">🔄 ${team.name} sub — ${scorer()} on, fresh legs.</span>`,"sub");refreshSubs2();paused=false;};
+        push2(curMin,`<span class="sub">🔄 ${team.name} sub — ${scorer(team.name)} on, fresh legs.</span>`,"sub");refreshSubs2();paused=false;};
       if(opts2.length===1){doSub(opts2[0]);return;}
       const overlay=document.createElement("div");overlay.className="subpick";
       overlay.innerHTML=opts2.map((o,i)=>`<button data-i="${i}">Sub for ${o[0].flag} ${o[0].name} (${o[1]._subs} left)</button>`).join("")+`<button data-cancel="1" class="btn ghost sm">Cancel</button>`;
@@ -568,10 +658,10 @@ async function commentary(home,away,homeCtrl,awayCtrl,group,opts){
       const ap=away.pw*(1+aq+(awayCtrl?awayCtrl._subBoost:0));
       const hxg=1.4*Math.pow(hp/ap,1.5)*hf.atk*af.def*1.06;
       const axg=1.4*Math.pow(ap/hp,1.5)*af.atk*hf.def;
-      if(Math.random()<hxg/90){hs++;if($("sc"))$("sc").textContent=`${hs} – ${as}`;push2(m,`<span class="goal">⚽ GOAL! ${home.name}</span> — ${scorer()} ${rnd(COMM.goal)}`,"goal");}
-      else if(Math.random()<axg/90){as++;if($("sc"))$("sc").textContent=`${hs} – ${as}`;push2(m,`<span class="goal">⚽ GOAL! ${away.name}</span> — ${scorer()} ${rnd(COMM.goal)}`,"goal");}
-      else if(Math.random()<0.10){const t=Math.random()<hxg/(hxg+axg)?home:away;push2(m,`<span class="danger">${t.name}</span> ${rnd(COMM.chance)}`,"danger");}
-      else if(Math.random()<0.16){const t=Math.random()<.5?home:away;push2(m,`${t.name} ${rnd(COMM.mid)}`);}
+      if(Math.random()<hxg/90){hs++;if($("sc"))$("sc").textContent=`${hs} – ${as}`;push2(m,`<span class="goal">⚽ GOAL! ${home.name}</span> — ${logGoal(home,true)} ${rnd(COMM.goal)}`,"goal");}
+      else if(Math.random()<axg/90){as++;if($("sc"))$("sc").textContent=`${hs} – ${as}`;push2(m,`<span class="goal">⚽ GOAL! ${away.name}</span> — ${logGoal(away,false)} ${rnd(COMM.goal)}`,"goal");}
+      else if(Math.random()<0.10){const t=Math.random()<hxg/(hxg+axg)?home:away;if(t===home){stat.hShots++;stat.hOn++;}else{stat.aShots++;stat.aOn++;}push2(m,`<span class="danger">${t.name}</span> ${rnd(COMM.chance)}`,"danger");}
+      else if(Math.random()<0.16){const t=Math.random()<.5?home:away;if(Math.random()<0.4){t===home?stat.hShots++:stat.aShots++;}push2(m,`${t.name} ${rnd(COMM.mid)}`);}
       while(paused) await sleep(60);
       if(!skip) await sleep(m%5===0?180:100);
     }
@@ -581,24 +671,111 @@ async function commentary(home,away,homeCtrl,awayCtrl,group,opts){
 
   async function finish(hs,as,pushFn){
     let resText,winner=null;
-    const hp=home.pw*(1+hq), ap=away.pw*(1+aq);
+    const hq2=homeCtrl?homeCtrl._qbonus:0, aq2=awayCtrl?awayCtrl._qbonus:0;
+    const hp=home.pw*(1+hq2), ap=away.pw*(1+aq2);
     if(group){apply(home,away,hs,as);
       resText=hs>as?`${home.name} take it`:as>hs?`${away.name} take it`:"Honours even";
     }else{
       if(hs>as)winner=home;else if(as>hs)winner=away;
-      else{pushFn(91,`<span class="danger">Level after 90 — extra time...</span>`,"danger");
-        const exH=pois(1.0),exA=pois(0.9);hs+=exH;as+=exA;if($("sc"))$("sc").textContent=`${hs} – ${as}`;
-        if(exH)pushFn(105,`<span class="goal">⚽ ${home.name}</span> — ${scorer()} in extra time!`,"goal");
-        if(exA)pushFn(105,`<span class="goal">⚽ ${away.name}</span> — ${scorer()} in extra time!`,"goal");
+      else{
+        // ---- EXTRA TIME: play 91'..120' live ----
+        if($("clk"))$("clk").textContent="EXTRA TIME";
+        pushFn(90,`<span class="danger">Level after 90 — we go to extra time!</span>`,"danger");
+        await sleep(skip?150:900);
+        // slightly lower scoring rate in ET (tired legs, caution)
+        const etScale=0.55;
+        for(let m=91;m<=120;m++){
+          curMin=m;if($("clk"))$("clk").textContent=`${m}' (ET)`;
+          const hf=homeCtrl?FORM[homeCtrl._form]:FORM.balanced;
+          const af=awayCtrl?FORM[awayCtrl._form]:FORM.balanced;
+          const hpp=home.pw*(1+hq2+(homeCtrl?homeCtrl._subBoost:0));
+          const app2=away.pw*(1+aq2+(awayCtrl?awayCtrl._subBoost:0));
+          const hxg=1.4*Math.pow(hpp/app2,1.5)*hf.atk*af.def*1.06*etScale;
+          const axg=1.4*Math.pow(app2/hpp,1.5)*af.atk*hf.def*etScale;
+          if(Math.random()<hxg/90){hs++;if($("sc"))$("sc").textContent=`${hs} – ${as}`;pushFn(m,`<span class="goal">⚽ GOAL! ${home.name}</span> — ${logGoal(home,true)} ${rnd(COMM.goal)}`,"goal");}
+          else if(Math.random()<axg/90){as++;if($("sc"))$("sc").textContent=`${hs} – ${as}`;pushFn(m,`<span class="goal">⚽ GOAL! ${away.name}</span> — ${logGoal(away,false)} ${rnd(COMM.goal)}`,"goal");}
+          else if(Math.random()<0.08){const t=Math.random()<hxg/(hxg+axg)?home:away;pushFn(m,`<span class="danger">${t.name}</span> ${rnd(COMM.chance)}`,"danger");}
+          else if(Math.random()<0.12){const t=Math.random()<.5?home:away;pushFn(m,`${t.name} ${rnd(COMM.mid)}`);}
+          if(m===105 && hs===as){pushFn(105,`<span class="danger">Half time in extra time. Still ${hs}-${as}.</span>`,"danger");if(!skip)await sleep(500);}
+          if(!skip) await sleep(m%5===0?180:100);
+        }
+        if($("clk"))$("clk").textContent="END OF EXTRA TIME";
         if(hs>as)winner=home;else if(as>hs)winner=away;
-        else{winner=Math.random()<hp/(hp+ap)?home:away;pushFn(120,`<span class="goal">PENALTIES — ${winner.name} hold their nerve!</span>`,"goal");}}
+        else{
+          // ---- PENALTY SHOOTOUT: live, kick by kick ----
+          winner=await shootout(home,away,hp,ap,pushFn);
+        }
+      }
       resText=`${winner.name} go through`;
     }
     pushFn(90,`<strong>FT — ${home.name} ${hs}-${as} ${away.name}. ${resText}.</strong>`,"goal");
     await sleep(skip?150:600);
+    // ---- POST-MATCH STATS PANEL ----
+    // pad shot counts a touch so totals read like a real match; possession from xg share
+    const hShots=stat.hShots+Math.round(Math.random()*4), aShots=stat.aShots+Math.round(Math.random()*4);
+    const hOn=Math.min(hShots,stat.hOn+Math.round(Math.random()*2)), aOn=Math.min(aShots,stat.aOn+Math.round(Math.random()*2));
+    const hpw=home.pw*(1+hq), apw=away.pw*(1+aq);
+    let hPoss=Math.round(100*hpw/(hpw+apw)); hPoss=Math.max(35,Math.min(65,hPoss)); const aPoss=100-hPoss;
+    const bar=(l,hv,av)=>`<div class="srow"><span class="sl">${hv}</span><span class="sm">${l}</span><span class="sr">${av}</span></div>`;
+    app.innerHTML+=`<div class="statbox">
+      <div class="sttitle">${home.flag} ${home.name} ${hs} – ${as} ${away.name} ${away.flag}</div>
+      ${bar("Possession %",hPoss,aPoss)}
+      ${bar("Shots",hShots,aShots)}
+      ${bar("On target",hOn,aOn)}
+    </div>`;
     app.innerHTML+=`<div class="row"><div class="spacer"></div><button class="btn" id="cont">Continue ▸</button></div>`;
     await new Promise(res=>$("cont").onclick=res);
     return winner;
+  }
+
+  // Live penalty shootout. Returns the winning team object.
+  async function shootout(home,away,hp,ap,pushFn){
+    if($("clk"))$("clk").textContent="PENALTIES";
+    pushFn(120,`<span class="danger">🥅 It goes to penalties!</span>`,"danger");
+    if(!skip) await sleep(800);
+    // conversion odds: base 0.75, nudged a touch by team quality
+    const oddH=Math.min(0.88,Math.max(0.62,0.75+(hp-ap)/600));
+    const oddA=Math.min(0.88,Math.max(0.62,0.75+(ap-hp)/600));
+    let ph=0,pa=0;
+    // build a little scoreboard line in the feed area
+    const board=()=>`<span class="pen-board">${home.flag} ${ph} — ${pa} ${away.flag}</span>`;
+    const takePen=async(team,odd,isHome)=>{
+      const taker=scorer(team.name);
+      const scored=Math.random()<odd;
+      if(scored){isHome?ph++:pa++;}
+      const tag=scored?`<span class="goal">✅ SCORED</span>`:`<span class="danger">❌ MISSED</span>`;
+      pushFn("PK",`${team.flag} ${taker} — ${tag}. ${board()}`, scored?"goal":"danger");
+      if(!skip) await sleep(650);
+    };
+    // best-of-5
+    for(let r=0;r<5;r++){
+      await takePen(home,oddH,true);
+      if(clinched(ph,pa,r,true)) return shootEnd(ph>pa?home:away);
+      await takePen(away,oddA,false);
+      if(clinched(ph,pa,r,false)) return shootEnd(ph>pa?home:away);
+    }
+    // sudden death
+    pushFn("PK",`<span class="danger">Sudden death!</span>`,"danger");
+    if(!skip) await sleep(500);
+    while(true){
+      await takePen(home,oddH,true);
+      await takePen(away,oddA,false);
+      if(ph>pa) return shootEnd(home);
+      if(pa>ph) return shootEnd(away);
+    }
+    function shootEnd(team){
+      pushFn("PK",`<span class="goal">🏆 ${team.name} win the shootout ${ph}-${pa}!</span>`,"goal");
+      return team;
+    }
+    // has the shootout been decided before all 5 are taken?
+    function clinched(ph,pa,roundIdx,homeJustWent){
+      const hTaken = roundIdx+1;
+      const aTaken = homeJustWent ? roundIdx : roundIdx+1;
+      const hR = 5-hTaken, aR = 5-aTaken;
+      if(ph > pa+aR) return true;   // away can't catch up
+      if(pa > ph+hR) return true;   // home can't catch up
+      return false;
+    }
   }
 }
 
@@ -610,6 +787,11 @@ function startKnockout(){
   for(let i=q.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[q[i],q[j]]=[q[j],q[i]];}
   S.bracket=q.map(t=>({name:t.name,flag:t.flag,pw:t.pw}));S.round=32;S.stage="ko";
   S.survivors=new Set(q.filter(t=>isHuman(t.name)).map(t=>t.name));
+  // exit-round tracking for the finishing leaderboard (higher = further)
+  // values: 0 groups, 32 R32, 16 R16, 8 QF, 4 SF, 2 Final(runner-up), 1 Champion
+  S.exit={};
+  const qualified=new Set(q.map(t=>t.name));
+  S.groups.forEach(g=>g.forEach(t=>{if(!qualified.has(t.name))S.exit[t.name]=0;}));
   const go=()=>renderKO("32 teams. Single elimination. Win or go home.");
   S.mode==="hotseat"?handoff(S.players[0].name,"Knockout draw is in",go):go();
 }
@@ -635,29 +817,82 @@ async function playKORound(){
   const b=S.bracket,next=[];
   for(let i=0;i<b.length;i+=2){
     const A=b[i],B=b[i+1];
+    let w;
     if(isHuman(A.name)||isHuman(B.name)){
-      const w=await liveMatch(A,B,{group:null,roundName:ROUND_NAME[S.round]});
-      next.push(w);[A,B].forEach(t=>{if(isHuman(t.name)&&t.name!==w.name)S.survivors.delete(t.name);});
-    }else next.push(koSim(A,B));
+      w=await liveMatch(A,B,{group:null,roundName:ROUND_NAME[S.round]});
+      [A,B].forEach(t=>{if(isHuman(t.name)&&t.name!==w.name)S.survivors.delete(t.name);});
+    }else w=koSim(A,B);
+    next.push(w);
+    // the loser exited at the current round value (32/16/8/4/2)
+    const loser=(w.name===A.name)?B:A;
+    S.exit[loser.name]=S.round;
   }
   S.bracket=next;
-  if(S.round===2){champion(next[0]);return;}
+  if(S.round===2){
+    // winner = champion (1), the beaten finalist already recorded exit=2 above
+    S.exit[next[0].name]=1;
+    champion(next[0]);return;
+  }
   S.round/=2;
   const go=()=>renderKO("New round, fresh draw.");
   S.mode==="hotseat"?handoff(S.players[0].name,`${ROUND_NAME[S.round]} draw`,go):go();
 }
-function koSim(A,B){let[s1,s2]=quickScore(A.pw,B.pw);if(s1===s2)return Math.random()<A.pw/(A.pw+B.pw)?A:B;return s1>s2?A:B;}
+function koSim(A,B){let[s1,s2]=quickScore(A.pw,B.pw);creditGoals(A.name,s1);creditGoals(B.name,s2);if(s1===s2)return Math.random()<A.pw/(A.pw+B.pw)?A:B;return s1>s2?A:B;}
+
+// turn an exit value into a readable finishing-round label
+function exitLabel(v){
+  if(v===1)return "🏆 Champion";
+  if(v===2)return "Runner-up";
+  if(v===4)return "Semi-finals";
+  if(v===8)return "Quarter-finals";
+  if(v===16)return "Round of 16";
+  if(v===32)return "Round of 32";
+  return "Group stage";
+}
+// higher sort key = finished higher.
+// exit values: 1 champion, 2 runner-up, 4 SF, 8 QF, 16 R16, 32 R32, 0 groups
+function finishRank(v){
+  const order={1:7,2:6,4:5,8:4,16:3,32:2,0:1};
+  return order[v]!==undefined?order[v]:0;
+}
 
 function champion(w){
   S.stage="done";const wHuman=isHuman(w.name);
-  const placings=S.players.map(p=>({flag:NAT[p.nation].flag,name:p.name,nation:p.nation,
-    won:p.nation===w.name,survived:S.survivors.has(p.nation)}));
-  const standHtml=placings.map(pl=>`<div>${pl.flag} ${pl.name} — ${pl.won?'<span style="color:var(--green)">🏆 CHAMPION</span>':pl.survived?'finalist':'<span class="out">eliminated</span>'}</div>`).join("");
-  app.innerHTML=`<div class="champ"><div class="big">${wHuman?'🏆':w.flag}</div>
+
+  // ---- Finishing leaderboard for the human managers ----
+  const placings=S.players.map(p=>{
+    const ev=(p.nation===w.name)?1:(S.exit[p.nation]!==undefined?S.exit[p.nation]:0);
+    return {flag:NAT[p.nation].flag,mgr:p.name,nation:p.nation,ev};
+  }).sort((a,b)=>finishRank(b.ev)-finishRank(a.ev));
+  const medals=["🥇","🥈","🥉"];
+  const leaderHtml=placings.map((pl,i)=>{
+    const pos=medals[i]||`${i+1}.`;
+    const champ=pl.ev===1;
+    return `<div class="lbrow ${champ?'champ-row':''}">
+      <span class="lbpos">${pos}</span>
+      <span class="lbname">${pl.flag} ${pl.mgr} <span class="lbnat">(${pl.nation})</span></span>
+      <span class="lbround">${exitLabel(pl.ev)}</span></div>`;
+  }).join("");
+
+  // ---- Golden Boot: top scorers across the whole tournament ----
+  const boot=Object.entries(S.boot||{}).map(([k,goals])=>{
+    const [player,team]=k.split("||");return {player,team,goals,flag:(NAT[team]?NAT[team].flag:"")};
+  }).sort((a,b)=>b.goals-a.goals).slice(0,5);
+  const bootHtml=boot.map((b,i)=>`<div class="lbrow">
+      <span class="lbpos">${i===0?'👟':(i+1)+'.'}</span>
+      <span class="lbname">${b.flag} ${b.player} <span class="lbnat">(${b.team})</span></span>
+      <span class="lbround">${b.goals} ${b.goals===1?'goal':'goals'}</span></div>`).join("");
+
+  app.innerHTML=`<div class="champ">
+    <div class="big">${wHuman?'🏆':w.flag}</div>
     <h2>${w.flag} ${w.name} — World Champions!</h2>
     <p class="lede">${wHuman?`${mgrName(w.name)} lifts the trophy. Bragging rights secured.`:`The CPU's ${w.name} spoiled the party — nobody in the room takes the glory.`}</p>
-    <div class="standings">${standHtml}</div>
-    <div class="row" style="justify-content:center"><button class="btn" id="again">New Tournament</button></div></div>`;
+    <div class="lbtitle">Final Standings</div>
+    <div class="leaderboard">${leaderHtml}</div>
+    <div class="lbtitle">👟 Golden Boot</div>
+    <div class="leaderboard">${bootHtml||'<div class="lbrow"><span class="lbname">No goals recorded</span></div>'}</div>
+    <div class="row" style="justify-content:center"><button class="btn" id="again">New Tournament</button></div>
+  </div>`;
   $("again").onclick=start;
 }
 
