@@ -948,8 +948,29 @@ async function commentary(home,away,homeCtrl,awayCtrl,group,opts){
     let ph=0,pa=0;
     // build a little scoreboard line in the feed area
     const board=()=>`<span class="pen-board">${home.flag} ${ph} — ${pa} ${away.flag}</span>`;
+    // build an ordered list of distinct penalty takers for a team (stars first, then squad fillers)
+    const buildTakers=(teamName)=>{
+      const order=[];
+      const stars=(STARS[teamName]||[]).slice();
+      // designated takers: the team's known names first
+      stars.forEach(s=>{if(!order.includes(s))order.push(s);});
+      // fill up to a healthy pool with distinct generic squad names
+      let guard=0;
+      while(order.length<9 && guard<60){
+        const n=rnd(SURNAMES);
+        if(!order.includes(n))order.push(n);
+        guard++;
+      }
+      return order;
+    };
+    const homeTakers=buildTakers(home.name), awayTakers=buildTakers(away.name);
+    let hIdx=0, aIdx=0;
+    const nextTaker=(isHome)=>{
+      if(isHome){const t=homeTakers[hIdx%homeTakers.length];hIdx++;return t;}
+      const t=awayTakers[aIdx%awayTakers.length];aIdx++;return t;
+    };
     const takePen=async(team,odd,isHome)=>{
-      const taker=scorer(team.name);
+      const taker=nextTaker(isHome);
       const scored=Math.random()<odd;
       if(scored){isHome?ph++:pa++;}
       const tag=scored?`<span class="goal">✅ SCORED</span>`:`<span class="danger">❌ MISSED</span>`;
