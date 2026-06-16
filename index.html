@@ -174,11 +174,10 @@
     <span class="cup">🏆</span>
     <div>
       <h1>World Cup 2026 · Hotseat Manager</h1>
-      <div class="sub">All 48 nations · real groups · subs & half-time switches</div>
     </div>
   </header>
   <div class="screen"><div class="panel" id="app"></div></div>
-  <footer>Group stage → Round of 32 → Final · live commentary for your matches · CPU sims the rest</footer>
+  <footer>World Cup 2026</footer>
 </div>
 
 <script>
@@ -669,11 +668,7 @@ function tacticsScreen(ctrl,ourTeam,oppTeam,roundName,allowQ,onDone){
     document.querySelectorAll("#opts button").forEach(x=>x.style.borderColor="#1c6b42");b.style.borderColor="var(--gold)";
     const opt=ctrl._q.opts[+b.dataset.k];
     ctrl._qbonus=opt[1];
-    // show what the choice actually does
-    let fb=$("qfeedback");
-    if(!fb){fb=document.createElement("div");fb.id="qfeedback";fb.className="qfeedback";$("opts").after(fb);}
-    const sign=opt[1]>0?'▲ boost':opt[1]<0?'▼ risk':'– neutral';
-    fb.innerHTML=`<span class="qfx ${opt[1]>0?'up':opt[1]<0?'down':''}">${sign}</span> ${opt[2]}`;
+    ctrl._qpending=opt; // remember the choice so we can reveal its effect at kick-off
     $("kick").disabled=false;});
   $("kick").onclick=onDone;
 }
@@ -736,6 +731,18 @@ async function commentary(home,away,homeCtrl,awayCtrl,group,opts){
   let skip=false;$("skip").onclick=()=>skip=true;
   const push=(min,txt,cls="")=>{const d=document.createElement("div");d.className="ev "+cls;
     d.innerHTML=`<span class="min">${min}'</span>${txt}`;feedEl.appendChild(d);feedEl.scrollTop=feedEl.scrollHeight;};
+
+  // reveal each human manager's pre-match question outcome now that the game has started
+  const revealChoice=(ctrl,team)=>{
+    if(!ctrl||!ctrl._qpending)return;
+    const opt=ctrl._qpending;
+    const sign=opt[1]>0?'▲ BOOST':opt[1]<0?'▼ RISK':'– NEUTRAL';
+    const cls=opt[1]>0?'goal':opt[1]<0?'danger':'';
+    push("0",`<span class="qfx ${opt[1]>0?'up':opt[1]<0?'down':''}">${team.name}: ${sign}</span> — ${opt[2]}`,cls);
+    ctrl._qpending=null; // consumed
+  };
+  revealChoice(homeCtrl,home);
+  revealChoice(awayCtrl,away);
 
   // sub handling: in hotseat we can only meaningfully offer subs to one device-holder at a time;
   // we offer to BOTH human controllers via a single button that the current holder uses.
